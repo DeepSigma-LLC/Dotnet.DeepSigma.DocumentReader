@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Description>Command-line tool (dsread) for DeepSigma.DocumentReader: detect, extract, inspect, and batch-process documents.</Description>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dsread</ToolCommandName>
+    <AssemblyName>dsread</AssemblyName>
+    <RootNamespace>DeepSigma.DocumentReader.Cli</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeepSigma.DocumentReader\DeepSigma.DocumentReader.csproj" />
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Export\DeepSigma.DocumentReader.Export.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+
+</Project>

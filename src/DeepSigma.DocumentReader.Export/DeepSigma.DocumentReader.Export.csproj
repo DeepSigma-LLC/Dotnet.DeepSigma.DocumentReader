@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Exporters that serialize a DeepSigma.DocumentReader result to plain text, Markdown, or JSON. Depends only on the contracts package.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Abstractions\DeepSigma.DocumentReader.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Dependency-light contracts (interfaces, DTOs, enums, options, exceptions) for DeepSigma.DocumentReader. Safe for any consumer or plugin to reference.</Description>
+  </PropertyGroup>
+
+  <!-- Contracts package: BCL only, no external dependencies by design. -->
+
+</Project>

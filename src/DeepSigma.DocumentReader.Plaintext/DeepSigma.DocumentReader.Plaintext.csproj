@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Lightweight, fully-managed readers for DeepSigma.DocumentReader: plain text, Markdown, JSON/JSON Lines, and CSV.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Abstractions\DeepSigma.DocumentReader.Abstractions.csproj" />
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Core\DeepSigma.DocumentReader.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Markdig" />
+    <PackageReference Include="CsvHelper" />
+  </ItemGroup>
+
+</Project>

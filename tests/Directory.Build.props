@@ -1,0 +1,13 @@
+<Project>
+
+  <!-- Inherit repo-wide settings. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <!-- xUnit1051 suggests threading TestContext.Current.CancellationToken everywhere; not
+         valuable for these fast, self-contained tests. -->
+    <NoWarn>$(NoWarn);xUnit1051</NoWarn>
+  </PropertyGroup>
+
+</Project>

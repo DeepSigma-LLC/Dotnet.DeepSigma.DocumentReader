@@ -1,0 +1,82 @@
+{
+  "source": {
+    "fileName": "sample.jsonl",
+    "sizeBytes": 0,
+    "detectedKind": "JsonLines"
+  },
+  "kind": "JsonLines",
+  "text": "{\u0022id\u0022: 1, \u0022name\u0022: \u0022first\u0022}\n{\u0022id\u0022: 2, \u0022name\u0022: \u0022second\u0022}\n{\u0022id\u0022: 3, \u0022name\u0022: \u0022third\u0022}\n",
+  "pages": [],
+  "sections": [],
+  "tables": [],
+  "images": [],
+  "attachments": [],
+  "metadata": {
+    "properties": {}
+  },
+  "warnings": [],
+  "quality": "High",
+  "features": [
+    {
+      "name": "Json",
+      "rootKind": "Array",
+      "values": [],
+      "records": [
+        {
+          "index": 0,
+          "rawText": "{\u0022id\u0022: 1, \u0022name\u0022: \u0022first\u0022}",
+          "values": [
+            {
+              "path": "$.id",
+              "textValue": "1",
+              "rawValue": 1,
+              "valueKind": "Number"
+            },
+            {
+              "path": "$.name",
+              "textValue": "first",
+              "rawValue": "first",
+              "valueKind": "String"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "rawText": "{\u0022id\u0022: 2, \u0022name\u0022: \u0022second\u0022}",
+          "values": [
+            {
+              "path": "$.id",
+              "textValue": "2",
+              "rawValue": 2,
+              "valueKind": "Number"
+            },
+            {
+              "path": "$.name",
+              "textValue": "second",
+              "rawValue": "second",
+              "valueKind": "String"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "rawText": "{\u0022id\u0022: 3, \u0022name\u0022: \u0022third\u0022}",
+          "values": [
+            {
+              "path": "$.id",
+              "textValue": "3",
+              "rawValue": 3,
+              "valueKind": "Number"
+            },
+            {
+              "path": "$.name",
+              "textValue": "third",
+              "rawValue": "third",
+              "valueKind": "String"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

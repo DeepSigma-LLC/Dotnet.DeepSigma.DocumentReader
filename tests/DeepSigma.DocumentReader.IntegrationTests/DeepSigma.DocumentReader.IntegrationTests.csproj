@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DeepSigma.DocumentReader\DeepSigma.DocumentReader.csproj" />
+    <ProjectReference Include="..\..\src\DeepSigma.DocumentReader.Export\DeepSigma.DocumentReader.Export.csproj" />
+    <ProjectReference Include="..\..\src\DeepSigma.DocumentReader.Cli\DeepSigma.DocumentReader.Cli.csproj" />
+  </ItemGroup>
+
+  <!-- Shared corpus of sample documents + golden files. -->
+  <ItemGroup>
+    <None Include="..\Corpus\**\*" Link="Corpus\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

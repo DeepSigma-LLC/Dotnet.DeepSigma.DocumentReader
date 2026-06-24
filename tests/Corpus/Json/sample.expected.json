@@ -1,0 +1,70 @@
+{
+  "source": {
+    "fileName": "sample.json",
+    "sizeBytes": 0,
+    "detectedKind": "Json"
+  },
+  "kind": "Json",
+  "text": "{\r\n  \u0022customer\u0022: {\r\n    \u0022name\u0022: \u0022Acme Corp\u0022,\r\n    \u0022active\u0022: true\r\n  },\r\n  \u0022invoice\u0022: {\r\n    \u0022total\u0022: 1234.56,\r\n    \u0022items\u0022: [\r\n      {\r\n        \u0022sku\u0022: \u0022ABC-123\u0022,\r\n        \u0022qty\u0022: 2\r\n      },\r\n      {\r\n        \u0022sku\u0022: \u0022XYZ-789\u0022,\r\n        \u0022qty\u0022: 1\r\n      }\r\n    ]\r\n  }\r\n}",
+  "pages": [],
+  "sections": [],
+  "tables": [],
+  "images": [],
+  "attachments": [],
+  "metadata": {
+    "properties": {}
+  },
+  "warnings": [],
+  "quality": "High",
+  "features": [
+    {
+      "name": "Json",
+      "rootKind": "Object",
+      "values": [
+        {
+          "path": "$.customer.name",
+          "textValue": "Acme Corp",
+          "rawValue": "Acme Corp",
+          "valueKind": "String"
+        },
+        {
+          "path": "$.customer.active",
+          "textValue": "true",
+          "rawValue": true,
+          "valueKind": "True"
+        },
+        {
+          "path": "$.invoice.total",
+          "textValue": "1234.56",
+          "rawValue": 1234.56,
+          "valueKind": "Number"
+        },
+        {
+          "path": "$.invoice.items[0].sku",
+          "textValue": "ABC-123",
+          "rawValue": "ABC-123",
+          "valueKind": "String"
+        },
+        {
+          "path": "$.invoice.items[0].qty",
+          "textValue": "2",
+          "rawValue": 2,
+          "valueKind": "Number"
+        },
+        {
+          "path": "$.invoice.items[1].sku",
+          "textValue": "XYZ-789",
+          "rawValue": "XYZ-789",
+          "valueKind": "String"
+        },
+        {
+          "path": "$.invoice.items[1].qty",
+          "textValue": "1",
+          "rawValue": 1,
+          "valueKind": "Number"
+        }
+      ],
+      "records": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Convenience meta-package for DeepSigma.DocumentReader. References the contracts, orchestration core, and the lightweight readers/exporters, and provides a one-call factory plus default dependency-injection registration. Excludes OCR (native dependencies stay opt-in).</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Abstractions\DeepSigma.DocumentReader.Abstractions.csproj" />
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Core\DeepSigma.DocumentReader.Core.csproj" />
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Plaintext\DeepSigma.DocumentReader.Plaintext.csproj" />
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Export\DeepSigma.DocumentReader.Export.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+</Project>

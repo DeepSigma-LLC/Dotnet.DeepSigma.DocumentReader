@@ -1,0 +1,29 @@
+<Project>
+
+  <!-- Repo-wide settings shared by every project (src, tests, samples). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Deterministic>true</Deterministic>
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <!-- Single repo-wide version (lockstep release of all packages). -->
+    <Version>0.1.0-preview.1</Version>
+
+    <!-- Shared NuGet metadata; only packable projects (src) actually emit packages. -->
+    <Authors>DeepSigma</Authors>
+    <Company>DeepSigma</Company>
+    <Product>DeepSigma.DocumentReader</Product>
+    <Copyright>Copyright (c) DeepSigma</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/DeepSigma/Dotnet.DeepSigma.DocumentReader</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DeepSigma/Dotnet.DeepSigma.DocumentReader</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- Not packable by default; src/Directory.Build.props opts in. -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+</Project>

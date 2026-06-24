@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DeepSigma.DocumentReader.Abstractions/DeepSigma.DocumentReader.Abstractions.csproj" />
+    <Project Path="src/DeepSigma.DocumentReader.Core/DeepSigma.DocumentReader.Core.csproj" />
+    <Project Path="src/DeepSigma.DocumentReader.Plaintext/DeepSigma.DocumentReader.Plaintext.csproj" />
+    <Project Path="src/DeepSigma.DocumentReader.Export/DeepSigma.DocumentReader.Export.csproj" />
+    <Project Path="src/DeepSigma.DocumentReader/DeepSigma.DocumentReader.csproj" />
+    <Project Path="src/DeepSigma.DocumentReader.Cli/DeepSigma.DocumentReader.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DeepSigma.DocumentReader.Core.Tests/DeepSigma.DocumentReader.Core.Tests.csproj" />
+    <Project Path="tests/DeepSigma.DocumentReader.Plaintext.Tests/DeepSigma.DocumentReader.Plaintext.Tests.csproj" />
+    <Project Path="tests/DeepSigma.DocumentReader.IntegrationTests/DeepSigma.DocumentReader.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/DeepSigma.DocumentReader.Samples.BasicExtraction/DeepSigma.DocumentReader.Samples.BasicExtraction.csproj" />
+  </Folder>
+  <Folder Name="/solution/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+    <File Path="docs/DesignGuidance.md" />
+  </Folder>
+</Solution>
