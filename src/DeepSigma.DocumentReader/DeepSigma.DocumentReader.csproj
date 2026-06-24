@@ -8,6 +8,7 @@
     <ProjectReference Include="..\DeepSigma.DocumentReader.Abstractions\DeepSigma.DocumentReader.Abstractions.csproj" />
     <ProjectReference Include="..\DeepSigma.DocumentReader.Core\DeepSigma.DocumentReader.Core.csproj" />
     <ProjectReference Include="..\DeepSigma.DocumentReader.Plaintext\DeepSigma.DocumentReader.Plaintext.csproj" />
+    <ProjectReference Include="..\DeepSigma.DocumentReader.Office\DeepSigma.DocumentReader.Office.csproj" />
     <ProjectReference Include="..\DeepSigma.DocumentReader.Export\DeepSigma.DocumentReader.Export.csproj" />
   </ItemGroup>
 

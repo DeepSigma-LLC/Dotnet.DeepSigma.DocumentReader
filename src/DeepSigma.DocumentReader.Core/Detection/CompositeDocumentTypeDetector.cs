@@ -1,3 +1,5 @@
+using System.IO.Compression;
+
 namespace DeepSigma.DocumentReader.Core.Detection;
 
 /// <summary>
@@ -45,8 +47,87 @@ public sealed class CompositeDocumentTypeDetector : IDocumentTypeDetector
             signal.Evaluate(context);
         }
 
+        await RefineOoxmlAsync(source, context, cancellationToken).ConfigureAwait(false);
+
         return Combine(context);
     }
+
+    /// <summary>
+    /// When the source is a ZIP container (by magic bytes or an Office extension), inspects
+    /// <c>[Content_Types].xml</c> to distinguish DOCX / XLSX / PPTX. Requires a seekable
+    /// stream; the position is restored afterwards.
+    /// </summary>
+    private static async Task RefineOoxmlAsync(DocumentSource source, DetectionContext context, CancellationToken cancellationToken)
+    {
+        if (!IsZip(context.Prefix.Span) && !IsOfficeExtension(context.Extension))
+        {
+            return;
+        }
+
+        Stream stream = source.Stream;
+        if (!stream.CanSeek)
+        {
+            return;
+        }
+
+        long position = stream.Position;
+        try
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            using var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+            ZipArchiveEntry? entry = archive.GetEntry("[Content_Types].xml");
+            if (entry is null)
+            {
+                return;
+            }
+
+            using var reader = new StreamReader(entry.Open());
+            string contentTypes = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+
+            DocumentKind kind = MapOoxmlContentTypes(contentTypes);
+            if (kind != DocumentKind.Unknown)
+            {
+                context.AddCandidate(kind, 95, "ooxml-container");
+            }
+        }
+        catch (InvalidDataException)
+        {
+            // Not a valid ZIP/OOXML container; leave the existing candidates as-is.
+        }
+        finally
+        {
+            stream.Seek(position, SeekOrigin.Begin);
+        }
+    }
+
+    private static DocumentKind MapOoxmlContentTypes(string contentTypes)
+    {
+        if (contentTypes.Contains("wordprocessingml.document", StringComparison.Ordinal))
+        {
+            return DocumentKind.WordDocument;
+        }
+
+        if (contentTypes.Contains("spreadsheetml.sheet", StringComparison.Ordinal))
+        {
+            return DocumentKind.Spreadsheet;
+        }
+
+        if (contentTypes.Contains("presentationml.presentation", StringComparison.Ordinal)
+            || contentTypes.Contains("presentationml.slideshow", StringComparison.Ordinal))
+        {
+            return DocumentKind.Presentation;
+        }
+
+        return DocumentKind.Unknown;
+    }
+
+    private static bool IsZip(ReadOnlySpan<byte> bytes)
+        => bytes.Length >= 4 && bytes[0] == 0x50 && bytes[1] == 0x4B && bytes[2] == 0x03 && bytes[3] == 0x04;
+
+    private static bool IsOfficeExtension(string? extension)
+        => FileFormatRegistry.KindFromExtension(extension) is DocumentKind.WordDocument
+            or DocumentKind.Spreadsheet
+            or DocumentKind.Presentation;
 
     private static DocumentTypeDetectionResult Combine(DetectionContext context)
     {

@@ -21,11 +21,12 @@ the library detects the type and routes to the right reader.
 
 ## Status
 
-**Phase 1 (foundation)** is implemented: the contracts, orchestration core, the lightweight
-text-family readers, exporters, and a CLI. Office, PDF, email, HTML, and OCR readers are
-planned for later phases (see [docs/DesignGuidance.md](docs/DesignGuidance.md)).
+**Phases 1–2** are implemented: the contracts, orchestration core, the text-family readers,
+the Office readers, exporters, and a CLI. PDF, email, HTML, and OCR readers are planned for
+later phases (see [docs/DesignGuidance.md](docs/DesignGuidance.md)).
 
-Implemented formats: **plain text, Markdown, JSON / JSON Lines, CSV**.
+Implemented formats: **plain text, Markdown, JSON / JSON Lines, CSV, Word (DOCX), Excel
+(XLSX), PowerPoint (PPTX)**.
 
 ## Packages
 
@@ -36,18 +37,19 @@ Packages are grouped by *dependency tree*, so a consumer only pulls the dependen
 | `DeepSigma.DocumentReader.Abstractions` | Contracts only (interfaces, DTOs, enums, options, exceptions) | none |
 | `DeepSigma.DocumentReader.Core` | Type detection, composite reader, stream handling, DI, shared reader base/builders | DI abstractions |
 | `DeepSigma.DocumentReader.Plaintext` | Text, Markdown, JSON/JSONL, CSV readers | Markdig, CsvHelper |
+| `DeepSigma.DocumentReader.Office` | Word (DOCX), Excel (XLSX), PowerPoint (PPTX) readers | DocumentFormat.OpenXml, ClosedXML |
 | `DeepSigma.DocumentReader.Export` | Text / Markdown / JSON exporters | none |
 | `DeepSigma.DocumentReader` | Convenience meta-package: factory + DI defaults | (the above) |
 | `DeepSigma.DocumentReader.Cli` | `dsread` command-line tool | System.CommandLine |
 
-Planned: `Office` (Word/Excel/PowerPoint), `Pdf`, `Email`, `Html`, `Ocr`.
+Planned: `Pdf`, `Email`, `Html`, `Ocr`.
 
 ## Dependency injection
 
 ```csharp
 builder.Services.AddDeepSigmaDocumentReaderDefaults();
 // or compose explicitly:
-builder.Services.AddDeepSigmaDocumentReader().AddText().AddJson().AddCsv().AddMarkdown();
+builder.Services.AddDeepSigmaDocumentReader().AddText().AddJson().AddCsv().AddMarkdown().AddOffice();
 ```
 
 ## CLI (`dsread`)

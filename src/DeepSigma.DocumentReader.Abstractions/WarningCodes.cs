@@ -43,4 +43,15 @@ public static class WarningCodes
 
     /// <summary>The configured maximum character count was reached and content was truncated.</summary>
     public const string TextTruncated = "Text.Truncated";
+
+    // Office.
+
+    /// <summary>Spreadsheet formulas were not recalculated; cached values were used.</summary>
+    public const string ExcelFormulaNotCalculated = "Excel.FormulaNotCalculated";
+
+    /// <summary>The configured maximum number of spreadsheet rows was reached.</summary>
+    public const string ExcelMaxRowsExceeded = "Excel.MaxRowsExceeded";
+
+    /// <summary>A hidden slide was skipped.</summary>
+    public const string PowerPointHiddenSlideSkipped = "PowerPoint.HiddenSlideSkipped";
 }

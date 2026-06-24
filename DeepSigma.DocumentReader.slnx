@@ -4,12 +4,14 @@
     <Project Path="src/DeepSigma.DocumentReader.Core/DeepSigma.DocumentReader.Core.csproj" />
     <Project Path="src/DeepSigma.DocumentReader.Plaintext/DeepSigma.DocumentReader.Plaintext.csproj" />
     <Project Path="src/DeepSigma.DocumentReader.Export/DeepSigma.DocumentReader.Export.csproj" />
+    <Project Path="src/DeepSigma.DocumentReader.Office/DeepSigma.DocumentReader.Office.csproj" />
     <Project Path="src/DeepSigma.DocumentReader/DeepSigma.DocumentReader.csproj" />
     <Project Path="src/DeepSigma.DocumentReader.Cli/DeepSigma.DocumentReader.Cli.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/DeepSigma.DocumentReader.Core.Tests/DeepSigma.DocumentReader.Core.Tests.csproj" />
     <Project Path="tests/DeepSigma.DocumentReader.Plaintext.Tests/DeepSigma.DocumentReader.Plaintext.Tests.csproj" />
+    <Project Path="tests/DeepSigma.DocumentReader.Office.Tests/DeepSigma.DocumentReader.Office.Tests.csproj" />
     <Project Path="tests/DeepSigma.DocumentReader.IntegrationTests/DeepSigma.DocumentReader.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/samples/">
