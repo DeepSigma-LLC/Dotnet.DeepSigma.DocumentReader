@@ -11,6 +11,12 @@ public static class DocumentReaderServiceCollectionExtensions
     /// formats DOCX/XLSX/PPTX, PDF, HTML, and email), and the text/Markdown/JSON exporters
     /// with their resolver. Does not include OCR.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// builder.Services.AddDeepSigmaDocumentReaderDefaults();
+    /// // then inject IDocumentReader (and IExporterResolver) anywhere.
+    /// </code>
+    /// </example>
     public static IServiceCollection AddDeepSigmaDocumentReaderDefaults(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);

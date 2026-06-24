@@ -78,6 +78,13 @@ public sealed class DocumentReadOptions
     /// Returns a copy of these options with the supplied format-specific options attached,
     /// keyed by their runtime type.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// DocumentReadOptions options = DocumentReadOptions.Default
+    ///     .WithOptions(new JsonReadOptions { FlattenPaths = true, MaxDepth = 32 })
+    ///     .WithOptions(new CsvReadOptions { Delimiter = ";" });
+    /// </code>
+    /// </example>
     public DocumentReadOptions WithOptions<T>(T options)
         where T : class, IFormatReadOptions
     {

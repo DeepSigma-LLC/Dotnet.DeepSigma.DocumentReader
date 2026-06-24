@@ -133,6 +133,15 @@ public abstract class DocumentAttachment
     public abstract Stream OpenReadStream();
 
     /// <summary>Wraps the attachment as a <see cref="DocumentSource"/> for recursive reading.</summary>
+    /// <example>
+    /// <code>
+    /// foreach (DocumentAttachment attachment in email.Attachments)
+    /// {
+    ///     using DocumentSource source = attachment.AsDocumentSource();
+    ///     DocumentReadResult inner = await reader.ReadAsync(source, options);
+    /// }
+    /// </code>
+    /// </example>
     public DocumentSource AsDocumentSource()
         => DocumentSource.FromStream(OpenReadStream(), FileName, ContentType);
 }

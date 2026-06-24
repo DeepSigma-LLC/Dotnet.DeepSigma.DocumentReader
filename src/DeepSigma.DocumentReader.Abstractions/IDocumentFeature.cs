@@ -15,6 +15,13 @@ public interface IDocumentFeature
 public static class DocumentFeatureExtensions
 {
     /// <summary>Returns the first feature of type <typeparamref name="T"/>, or <see langword="null"/>.</summary>
+    /// <example>
+    /// <code>
+    /// if (result.GetFeature&lt;JsonDocumentFeature&gt;() is { } json)
+    ///     foreach (JsonPathValue value in json.Values)
+    ///         Console.WriteLine($"{value.Path} = {value.TextValue}");
+    /// </code>
+    /// </example>
     public static T? GetFeature<T>(this DocumentReadResult result)
         where T : class, IDocumentFeature
     {

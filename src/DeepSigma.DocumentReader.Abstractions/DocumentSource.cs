@@ -15,6 +15,13 @@ namespace DeepSigma.DocumentReader;
 /// own their streams, while <see cref="FromStream"/> does not.
 /// </para>
 /// </remarks>
+/// <example>
+/// <code>
+/// using DocumentSource fromFile = DocumentSource.FromFile("report.docx");
+/// using DocumentSource fromBytes = DocumentSource.FromBytes(bytes, "data.json", "application/json");
+/// DocumentSource fromStream = DocumentSource.FromStream(httpStream, "page.html", "text/html");
+/// </code>
+/// </example>
 public sealed class DocumentSource : IDisposable
 {
     private DocumentSource(Stream stream, string? fileName, string? contentType, bool ownsStream)

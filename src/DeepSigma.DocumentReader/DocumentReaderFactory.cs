@@ -19,6 +19,14 @@ public static class DocumentReaderFactory
     /// that manage their own lifetime/scopes, prefer
     /// <see cref="DocumentReaderServiceCollectionExtensions.AddDeepSigmaDocumentReaderDefaults"/>.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// IDocumentReader reader = DocumentReaderFactory.CreateDefault();
+    /// using DocumentSource source = DocumentSource.FromFile("invoice.pdf");
+    /// DocumentReadResult result = await reader.ReadAsync(source, DocumentReadOptions.Default);
+    /// Console.WriteLine(result.Text);
+    /// </code>
+    /// </example>
     public static IDocumentReader CreateDefault() => DefaultReader.Value;
 
     private static IDocumentReader BuildDefault()
