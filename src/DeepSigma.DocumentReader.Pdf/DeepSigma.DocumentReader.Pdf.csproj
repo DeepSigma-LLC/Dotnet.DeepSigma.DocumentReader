@@ -14,4 +14,8 @@
     <PackageReference Include="PdfPig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="DeepSigma.DocumentReader.Pdf.Tests" />
+  </ItemGroup>
+
 </Project>

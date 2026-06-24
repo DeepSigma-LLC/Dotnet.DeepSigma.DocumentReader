@@ -22,7 +22,10 @@ public sealed class WordDocumentReaderTests
 
         DocumentSection top = Assert.Single(result.Sections);
         Assert.Equal("Overview", top.Title);
-        Assert.Equal("Details", Assert.Single(top.Children).Title);
+        Assert.Contains("Revenue increased", top.Text, StringComparison.Ordinal);
+        DocumentSection details = Assert.Single(top.Children);
+        Assert.Equal("Details", details.Title);
+        Assert.Contains("Some details about the system.", details.Text, StringComparison.Ordinal);
 
         DocumentTable table = Assert.Single(result.Tables);
         Assert.Equal("100", table.Rows[1].Cells[1].Text);

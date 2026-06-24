@@ -26,7 +26,8 @@ public sealed class WordDocumentReader : FormatDocumentReaderBase
         Body? body = mainPart?.Document?.Body;
 
         var text = new StringBuilder();
-        var headings = new List<HeadingEntry>();
+        var sections = new List<SectionAccumulator>();
+        SectionAccumulator? currentSection = null;
         var tables = new List<DocumentTable>();
 
         if (body is not null)
@@ -37,7 +38,23 @@ public sealed class WordDocumentReader : FormatDocumentReaderBase
                 switch (element)
                 {
                     case Paragraph paragraph:
-                        AppendParagraph(paragraph, options, text, headings);
+                        string content = GetParagraphText(paragraph, options.IncludeDeletedText);
+                        if (content.Length == 0)
+                        {
+                            break;
+                        }
+
+                        text.Append(content).Append('\n');
+                        if (HeadingLevel(paragraph) is { } level)
+                        {
+                            currentSection = new SectionAccumulator(level, content);
+                            sections.Add(currentSection);
+                        }
+                        else
+                        {
+                            currentSection?.Body.Append(content).Append('\n');
+                        }
+
                         break;
 
                     case Table table when options.ExtractTables:
@@ -46,6 +63,10 @@ public sealed class WordDocumentReader : FormatDocumentReaderBase
                 }
             }
         }
+
+        var headings = sections
+            .Select(s => new HeadingEntry(s.Level, s.Title, NullIfEmpty(s.Body)))
+            .ToList();
 
         if (options.IncludeHeadersAndFooters && mainPart is not null)
         {
@@ -77,20 +98,15 @@ public sealed class WordDocumentReader : FormatDocumentReaderBase
         return Task.FromResult(result);
     }
 
-    private static void AppendParagraph(Paragraph paragraph, WordReadOptions options, StringBuilder text, List<HeadingEntry> headings)
+    private sealed class SectionAccumulator(int level, string title)
     {
-        string content = GetParagraphText(paragraph, options.IncludeDeletedText);
-        int? level = HeadingLevel(paragraph);
-        if (level is { } headingLevel && content.Length > 0)
-        {
-            headings.Add(new HeadingEntry(headingLevel, content));
-        }
-
-        if (content.Length > 0)
-        {
-            text.Append(content).Append('\n');
-        }
+        public int Level { get; } = level;
+        public string Title { get; } = title;
+        public StringBuilder Body { get; } = new();
     }
+
+    private static string? NullIfEmpty(StringBuilder body)
+        => body.Length == 0 ? null : body.ToString().TrimEnd('\n');
 
     private static string GetParagraphText(Paragraph paragraph, bool includeDeleted)
     {

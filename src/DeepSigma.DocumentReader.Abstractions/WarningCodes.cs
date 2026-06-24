@@ -62,4 +62,7 @@ public static class WarningCodes
 
     /// <summary>The configured maximum number of pages was reached.</summary>
     public const string PdfMaxPagesExceeded = "Pdf.MaxPagesExceeded";
+
+    /// <summary>A table was extracted from a PDF with low confidence in its structure.</summary>
+    public const string PdfLowConfidenceTableExtraction = "Pdf.LowConfidenceTableExtraction";
 }

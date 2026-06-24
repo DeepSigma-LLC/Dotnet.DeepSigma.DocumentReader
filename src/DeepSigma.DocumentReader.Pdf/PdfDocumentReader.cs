@@ -1,5 +1,6 @@
 using System.Text;
 using DeepSigma.DocumentReader.Core.Readers;
+using DeepSigma.DocumentReader.Pdf.Internal;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
@@ -33,6 +34,7 @@ public sealed class PdfDocumentReader : FormatDocumentReaderBase
         }
 
         var pages = new List<DocumentPage>(pagesToRead);
+        var tables = new List<DocumentTable>();
         var text = new StringBuilder();
         int pagesWithText = 0;
 
@@ -44,10 +46,23 @@ public sealed class PdfDocumentReader : FormatDocumentReaderBase
             bool hasTextLayer = page.Letters.Count > 0;
             string pageText = hasTextLayer ? ExtractText(page, options) : string.Empty;
 
+            var pageTables = new List<DocumentTable>();
             if (hasTextLayer)
             {
                 pagesWithText++;
                 text.Append(pageText).Append("\n\n");
+
+                if (options.ExtractTables && PdfTableExtractor.Extract(page, pageNumber) is { } extracted)
+                {
+                    pageTables.Add(extracted.Table);
+                    tables.Add(extracted.Table);
+                    if (extracted.Confidence <= options.LowConfidenceThreshold)
+                    {
+                        context.AddWarning(WarningCodes.PdfLowConfidenceTableExtraction,
+                            $"Low-confidence table extraction on page {pageNumber} (confidence {extracted.Confidence:0.00}).",
+                            new DocumentLocation(PageNumber: pageNumber));
+                    }
+                }
             }
             else
             {
@@ -56,7 +71,7 @@ public sealed class PdfDocumentReader : FormatDocumentReaderBase
                     new DocumentLocation(PageNumber: pageNumber));
             }
 
-            pages.Add(new DocumentPage { PageNumber = pageNumber, Text = pageText });
+            pages.Add(new DocumentPage { PageNumber = pageNumber, Text = pageText, Tables = pageTables });
         }
 
         var result = new DocumentReadResult
@@ -65,6 +80,7 @@ public sealed class PdfDocumentReader : FormatDocumentReaderBase
             Kind = DocumentKind.Pdf,
             Text = context.Options.ExtractText ? text.ToString().TrimEnd('\n') : null,
             Pages = pages,
+            Tables = tables,
             Metadata = ReadMetadata(document, totalPages),
             Quality = AssessQuality(pagesWithText, pages.Count),
             Warnings = context.Warnings.ToArray(),
@@ -93,6 +109,8 @@ public sealed class PdfDocumentReader : FormatDocumentReaderBase
         {
             Title = string.IsNullOrEmpty(information.Title) ? null : information.Title,
             Author = string.IsNullOrEmpty(information.Author) ? null : information.Author,
+            CreatedUtc = PdfDateParser.Parse(information.CreationDate),
+            ModifiedUtc = PdfDateParser.Parse(information.ModifiedDate),
             PageCount = pageCount,
         };
     }

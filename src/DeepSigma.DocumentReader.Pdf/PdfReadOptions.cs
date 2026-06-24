@@ -14,4 +14,16 @@ public sealed class PdfReadOptions : IFormatReadOptions
     /// (reading) order when extracting page text. Default <see langword="false"/>.
     /// </summary>
     public bool PreserveLayout { get; init; }
+
+    /// <summary>
+    /// Whether to attempt best-effort table extraction by clustering word coordinates.
+    /// Default <see langword="false"/>; results are approximate and carry a confidence score.
+    /// </summary>
+    public bool ExtractTables { get; init; }
+
+    /// <summary>
+    /// Tables with a confidence at or below this threshold raise a low-confidence warning.
+    /// Default 0.6.
+    /// </summary>
+    public double LowConfidenceThreshold { get; init; } = 0.6;
 }

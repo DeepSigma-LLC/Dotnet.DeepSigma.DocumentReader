@@ -27,17 +27,7 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
 
         using IDocument document = Parser.ParseDocument(html);
 
-        var headings = new List<DocumentHeading>();
-        var headingEntries = new List<HeadingEntry>();
-        foreach (IElement element in document.QuerySelectorAll("h1,h2,h3,h4,h5,h6"))
-        {
-            int level = element.LocalName.Length == 2 && char.IsDigit(element.LocalName[1])
-                ? element.LocalName[1] - '0'
-                : 1;
-            string headingText = element.TextContent.Trim();
-            headings.Add(new DocumentHeading(level, headingText));
-            headingEntries.Add(new HeadingEntry(level, headingText));
-        }
+        (IReadOnlyList<DocumentHeading> headings, IReadOnlyList<HeadingEntry> headingEntries) = ExtractHeadings(document);
 
         var tables = options.ExtractTables ? ConvertTables(document) : [];
         var links = options.ExtractLinks ? ConvertLinks(document) : [];
@@ -54,6 +44,94 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
             Warnings = context.Warnings.ToArray(),
             Features = [new HtmlDocumentFeature { Headings = headings, Links = links }],
         };
+    }
+
+    private static readonly HashSet<string> SkipElements =
+        new(StringComparer.OrdinalIgnoreCase) { "script", "style", "noscript", "head", "title", "template" };
+
+    private static readonly HashSet<string> BlockElements = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "p", "div", "section", "article", "header", "footer", "main", "aside",
+        "ul", "ol", "li", "table", "tr", "blockquote", "pre", "figure", "br",
+    };
+
+    private sealed class SectionAccumulator(int level, string title)
+    {
+        public int Level { get; } = level;
+        public string Title { get; } = title;
+        public StringBuilder Body { get; } = new();
+    }
+
+    /// <summary>
+    /// Walks the document in order, capturing each heading and the text that follows it (up
+    /// to the next heading) as the section body.
+    /// </summary>
+    private static (IReadOnlyList<DocumentHeading> Headings, IReadOnlyList<HeadingEntry> Entries) ExtractHeadings(IDocument document)
+    {
+        var headings = new List<DocumentHeading>();
+        var sections = new List<SectionAccumulator>();
+        SectionAccumulator? current = null;
+        INode root = document.Body ?? (INode)document.DocumentElement;
+
+        Walk(root);
+        void Walk(INode node)
+        {
+            foreach (INode child in node.ChildNodes)
+            {
+                switch (child)
+                {
+                    case IText text:
+                        current?.Body.Append(text.Data);
+                        break;
+
+                    case IElement element when !SkipElements.Contains(element.LocalName):
+                        if (IsHeading(element, out int level))
+                        {
+                            string title = element.TextContent.Trim();
+                            headings.Add(new DocumentHeading(level, title));
+                            current = new SectionAccumulator(level, title);
+                            sections.Add(current);
+                            break; // title captured; do not descend into the heading
+                        }
+
+                        Walk(element);
+                        if (BlockElements.Contains(element.LocalName))
+                        {
+                            current?.Body.Append('\n');
+                        }
+
+                        break;
+                }
+            }
+        }
+
+        var entries = sections
+            .Select(s => new HeadingEntry(s.Level, s.Title, NormalizeBody(s.Body.ToString())))
+            .ToList();
+        return (headings, entries);
+    }
+
+    private static bool IsHeading(IElement element, out int level)
+    {
+        string name = element.LocalName;
+        if (name.Length == 2 && name[0] is 'h' or 'H' && name[1] is >= '1' and <= '6')
+        {
+            level = name[1] - '0';
+            return true;
+        }
+
+        level = 0;
+        return false;
+    }
+
+    private static string? NormalizeBody(string text)
+    {
+        IEnumerable<string> lines = text
+            .Split('\n')
+            .Select(line => string.Join(' ', line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)))
+            .Where(line => line.Length > 0);
+        string normalized = string.Join("\n", lines);
+        return normalized.Length == 0 ? null : normalized;
     }
 
     private static IReadOnlyList<DocumentTable> ConvertTables(IDocument document)

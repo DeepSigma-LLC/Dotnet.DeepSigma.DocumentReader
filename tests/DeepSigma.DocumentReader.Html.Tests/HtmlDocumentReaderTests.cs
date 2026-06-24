@@ -51,6 +51,7 @@ public sealed class HtmlDocumentReaderTests
 
         DocumentSection top = Assert.Single(result.Sections);
         Assert.Equal("Overview", top.Title);
+        Assert.Contains("Revenue increased year over year.", top.Text, StringComparison.Ordinal);
         Assert.Equal("Details", Assert.Single(top.Children).Title);
 
         DocumentTable table = Assert.Single(result.Tables);

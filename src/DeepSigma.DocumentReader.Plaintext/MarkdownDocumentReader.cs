@@ -37,13 +37,31 @@ public sealed class MarkdownDocumentReader : FormatDocumentReaderBase
         MarkdownDocument document = Markdown.Parse(text, Pipeline);
 
         var headings = new List<DocumentHeading>();
-        var headingEntries = new List<HeadingEntry>();
-        foreach (HeadingBlock heading in document.Descendants<HeadingBlock>())
+        var sections = new List<SectionAccumulator>();
+        SectionAccumulator? current = null;
+        for (int i = 0; i < document.Count; i++)
         {
-            string headingText = GetInlineText(heading.Inline);
-            headings.Add(new DocumentHeading(heading.Level, headingText));
-            headingEntries.Add(new HeadingEntry(heading.Level, headingText));
+            Block block = document[i];
+            if (block is HeadingBlock heading)
+            {
+                string headingText = GetInlineText(heading.Inline);
+                headings.Add(new DocumentHeading(heading.Level, headingText));
+                current = new SectionAccumulator(heading.Level, headingText);
+                sections.Add(current);
+            }
+            else if (current is not null && block is LeafBlock leaf && leaf.Inline is not null)
+            {
+                string blockText = GetInlineText(leaf.Inline);
+                if (blockText.Length > 0)
+                {
+                    current.Body.Append(blockText).Append('\n');
+                }
+            }
         }
+
+        var headingEntries = sections
+            .Select(s => new HeadingEntry(s.Level, s.Title, s.Body.Length == 0 ? null : s.Body.ToString().TrimEnd('\n')))
+            .ToList();
 
         var tables = context.Options.ExtractTables ? ConvertTables(document) : [];
         var codeBlocks = options.ExtractCodeBlocks ? ConvertCodeBlocks(document) : [];
@@ -176,6 +194,13 @@ public sealed class MarkdownDocumentReader : FormatDocumentReaderBase
         }
 
         return result;
+    }
+
+    private sealed class SectionAccumulator(int level, string title)
+    {
+        public int Level { get; } = level;
+        public string Title { get; } = title;
+        public StringBuilder Body { get; } = new();
     }
 
     private static string GetInlineText(ContainerInline? container)

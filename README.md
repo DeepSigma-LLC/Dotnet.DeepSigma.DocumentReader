@@ -21,9 +21,9 @@ the library detects the type and routes to the right reader.
 
 ## Status
 
-**Phases 1–4** are implemented: the contracts, orchestration core, the text-family readers,
-the Office readers, the PDF reader, the HTML and email readers, exporters, and a CLI. OCR is
-planned for a later phase (see [docs/DesignGuidance.md](docs/DesignGuidance.md)).
+The contracts, orchestration core, the text-family readers, the Office readers, the PDF
+reader, the HTML and email readers, exporters, and a CLI are implemented (see
+[docs/DesignGuidance.md](docs/DesignGuidance.md) for the broader design).
 
 Implemented formats: **plain text, Markdown, JSON / JSON Lines, CSV, Word (DOCX), Excel
 (XLSX), PowerPoint (PPTX), PDF, HTML, email (.eml)**.
@@ -38,7 +38,7 @@ Packages are grouped by *dependency tree*, so a consumer only pulls the dependen
 | `DeepSigma.DocumentReader.Core` | Type detection, composite reader, stream handling, DI, shared reader base/builders | DI abstractions |
 | `DeepSigma.DocumentReader.Plaintext` | Text, Markdown, JSON/JSONL, CSV readers | Markdig, CsvHelper |
 | `DeepSigma.DocumentReader.Office` | Word (DOCX), Excel (XLSX), PowerPoint (PPTX) readers | DocumentFormat.OpenXml, ClosedXML |
-| `DeepSigma.DocumentReader.Pdf` | PDF reader (page text, page model, metadata) | PdfPig |
+| `DeepSigma.DocumentReader.Pdf` | PDF reader (page text, page model, metadata; opt-in best-effort tables) | PdfPig |
 | `DeepSigma.DocumentReader.Html` | HTML reader (text, sections, tables, links) | AngleSharp |
 | `DeepSigma.DocumentReader.Email` | Email (.eml) reader (headers, bodies, attachments) | MimeKit |
 | `DeepSigma.DocumentReader.Export` | Text / Markdown / JSON exporters | none |
@@ -47,8 +47,6 @@ Packages are grouped by *dependency tree*, so a consumer only pulls the dependen
 
 The email reader reuses the HTML reader's text extraction (via the `IHtmlTextExtractor`
 contract) when both are registered, without taking a hard dependency on it.
-
-Planned: `Ocr`.
 
 ## Dependency injection
 

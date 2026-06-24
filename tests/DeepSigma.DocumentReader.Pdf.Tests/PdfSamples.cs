@@ -30,4 +30,31 @@ internal static class PdfSamples
         builder.AddPage(PageSize.A4);
         return builder.Build();
     }
+
+    /// <summary>Creates a single-page PDF whose text is laid out as a 3×3 grid.</summary>
+    public static byte[] CreateGrid()
+    {
+        var builder = new PdfDocumentBuilder();
+        PdfDocumentBuilder.AddedFont font = builder.AddStandard14Font(Standard14Font.Helvetica);
+        PdfPageBuilder page = builder.AddPage(PageSize.A4);
+
+        double[] columnX = [50, 220, 390];
+        double[] rowY = [700, 670, 640];
+        string[][] grid =
+        [
+            ["Name", "Age", "City"],
+            ["Alice", "30", "London"],
+            ["Bob", "25", "Paris"],
+        ];
+
+        for (int r = 0; r < grid.Length; r++)
+        {
+            for (int c = 0; c < grid[r].Length; c++)
+            {
+                page.AddText(grid[r][c], 10, new PdfPoint(columnX[c], rowY[r]), font);
+            }
+        }
+
+        return builder.Build();
+    }
 }

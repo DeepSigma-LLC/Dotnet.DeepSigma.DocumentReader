@@ -43,9 +43,11 @@ public sealed class MarkdownDocumentReaderTests
 
         DocumentSection top = Assert.Single(result.Sections);
         Assert.Equal("Top", top.Title);
+        Assert.Equal("Intro text.", top.Text);
         DocumentSection sub = Assert.Single(top.Children);
         Assert.Equal("Sub", sub.Title);
         Assert.Equal("/Top/Sub", sub.Location!.SectionPath);
+        Assert.Contains("docs", sub.Text, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -47,6 +47,29 @@ public sealed class PdfDocumentReaderTests
     }
 
     [Fact]
+    public async Task Extracts_grid_table_when_enabled()
+    {
+        var options = DocumentReadOptions.Default.WithOptions(new PdfReadOptions { ExtractTables = true });
+        DocumentReadResult result = await ReadAsync(PdfSamples.CreateGrid(), options);
+
+        DocumentTable table = Assert.Single(result.Tables);
+        Assert.Equal(3, table.Rows.Count);
+        Assert.Equal(3, table.Rows[0].Cells.Count);
+        Assert.Equal("Name", table.Rows[0].Cells[0].Text);
+        Assert.Equal("Alice", table.Rows[1].Cells[0].Text);
+        Assert.Equal("London", table.Rows[1].Cells[2].Text);
+        Assert.NotNull(table.Confidence);
+        Assert.True(table.Confidence > 0.9, $"confidence was {table.Confidence}");
+    }
+
+    [Fact]
+    public async Task Does_not_extract_tables_by_default()
+    {
+        DocumentReadResult result = await ReadAsync(PdfSamples.CreateGrid());
+        Assert.Empty(result.Tables);
+    }
+
+    [Fact]
     public async Task Composite_detects_and_routes_pdf()
     {
         var reader = new CompositeDocumentReader([new PdfDocumentReader()], CompositeDocumentTypeDetector.CreateDefault());
