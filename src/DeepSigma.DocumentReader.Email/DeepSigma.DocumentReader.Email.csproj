@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <Description>Email (.eml) reader for DeepSigma.DocumentReader using MimeKit: headers, text and HTML bodies, and attachments. Remote content is never fetched.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DeepSigma.DocumentReader.Email</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>DeepSigma LLC</Authors>
+    <Company>$(Authors)</Company>
   </PropertyGroup>
 
   <ItemGroup>

@@ -24,9 +24,7 @@
     <Project Path="samples/DeepSigma.DocumentReader.Samples.BasicExtraction/DeepSigma.DocumentReader.Samples.BasicExtraction.csproj" />
   </Folder>
   <Folder Name="/solution/">
-    <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
     <File Path="README.md" />
-    <File Path="docs/DesignGuidance.md" />
   </Folder>
 </Solution>

@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <Description>Dependency-light contracts (interfaces, DTOs, enums, options, exceptions) for DeepSigma.DocumentReader. Safe for any consumer or plugin to reference.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DeepSigma.DocumentReader.Abstractions</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>DeepSigma LLC</Authors>
+    <Company>$(Authors)</Company>
   </PropertyGroup>
 
   <!-- Contracts package: BCL only, no external dependencies by design. -->

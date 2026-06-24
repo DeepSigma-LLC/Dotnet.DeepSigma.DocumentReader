@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <Description>Lightweight, fully-managed readers for DeepSigma.DocumentReader: plain text, Markdown, JSON/JSON Lines, and CSV.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DeepSigma LLC</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>DeepSigma LLC</Authors>
+    <Company>$(Authors)</Company>
   </PropertyGroup>
 
   <ItemGroup>

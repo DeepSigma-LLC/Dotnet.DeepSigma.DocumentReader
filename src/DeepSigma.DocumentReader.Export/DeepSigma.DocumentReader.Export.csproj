@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <Description>Exporters that serialize a DeepSigma.DocumentReader result to plain text, Markdown, or JSON. Depends only on the contracts package.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DeepSigma.DocumentReader.Export</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>DeepSigma LLC</Authors>
+    <Company>$(Authors)</Company>
   </PropertyGroup>
 
   <ItemGroup>

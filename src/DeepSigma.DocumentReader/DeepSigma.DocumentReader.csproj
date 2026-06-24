@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <Description>Convenience meta-package for DeepSigma.DocumentReader. References the contracts, orchestration core, and the lightweight readers/exporters, and provides a one-call factory plus default dependency-injection registration. Excludes OCR (native dependencies stay opt-in).</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DeepSigma.DocumentReader</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>DeepSigma LLC</Authors>
+    <Company>$(Authors)</Company>
   </PropertyGroup>
 
   <ItemGroup>

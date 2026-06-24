@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <Description>Readers for Office Open XML documents in DeepSigma.DocumentReader: Word (DOCX), Excel (XLSX), and PowerPoint (PPTX). Macros are never executed.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DeepSigma.DocumentReader.Office</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>DeepSigma LLC</Authors>
+    <Company>$(Authors)</Company>
   </PropertyGroup>
 
   <ItemGroup>

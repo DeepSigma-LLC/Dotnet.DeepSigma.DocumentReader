@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <Description>PDF reader for DeepSigma.DocumentReader: page-based text extraction, page model, and metadata, using PdfPig. Best-effort only; scanned PDFs with no text layer are flagged with a warning.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DeepSigma.DocumentReader.Pdf</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>DeepSigma LLC</Authors>
+    <Company>$(Authors)</Company>
   </PropertyGroup>
 
   <ItemGroup>

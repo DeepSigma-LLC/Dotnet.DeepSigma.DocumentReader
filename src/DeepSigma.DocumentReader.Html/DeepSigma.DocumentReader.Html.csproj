@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <Description>HTML reader for DeepSigma.DocumentReader using AngleSharp: readable text, headings, tables, and links. External resources are never loaded.</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DeepSigma.DocumentReader.Html</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>DeepSigma LLC</Authors>
+    <Company>$(Authors)</Company>
   </PropertyGroup>
 
   <ItemGroup>
