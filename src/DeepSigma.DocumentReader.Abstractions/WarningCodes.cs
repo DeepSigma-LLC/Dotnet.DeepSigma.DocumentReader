@@ -54,4 +54,12 @@ public static class WarningCodes
 
     /// <summary>A hidden slide was skipped.</summary>
     public const string PowerPointHiddenSlideSkipped = "PowerPoint.HiddenSlideSkipped";
+
+    // PDF.
+
+    /// <summary>A page has no extractable text layer (likely scanned); OCR would be required.</summary>
+    public const string PdfTextLayerMissing = "Pdf.TextLayerMissing";
+
+    /// <summary>The configured maximum number of pages was reached.</summary>
+    public const string PdfMaxPagesExceeded = "Pdf.MaxPagesExceeded";
 }

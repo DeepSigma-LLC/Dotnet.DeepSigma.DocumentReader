@@ -21,12 +21,12 @@ the library detects the type and routes to the right reader.
 
 ## Status
 
-**Phases 1–2** are implemented: the contracts, orchestration core, the text-family readers,
-the Office readers, exporters, and a CLI. PDF, email, HTML, and OCR readers are planned for
-later phases (see [docs/DesignGuidance.md](docs/DesignGuidance.md)).
+**Phases 1–4** are implemented: the contracts, orchestration core, the text-family readers,
+the Office readers, the PDF reader, the HTML and email readers, exporters, and a CLI. OCR is
+planned for a later phase (see [docs/DesignGuidance.md](docs/DesignGuidance.md)).
 
 Implemented formats: **plain text, Markdown, JSON / JSON Lines, CSV, Word (DOCX), Excel
-(XLSX), PowerPoint (PPTX)**.
+(XLSX), PowerPoint (PPTX), PDF, HTML, email (.eml)**.
 
 ## Packages
 
@@ -38,18 +38,25 @@ Packages are grouped by *dependency tree*, so a consumer only pulls the dependen
 | `DeepSigma.DocumentReader.Core` | Type detection, composite reader, stream handling, DI, shared reader base/builders | DI abstractions |
 | `DeepSigma.DocumentReader.Plaintext` | Text, Markdown, JSON/JSONL, CSV readers | Markdig, CsvHelper |
 | `DeepSigma.DocumentReader.Office` | Word (DOCX), Excel (XLSX), PowerPoint (PPTX) readers | DocumentFormat.OpenXml, ClosedXML |
+| `DeepSigma.DocumentReader.Pdf` | PDF reader (page text, page model, metadata) | PdfPig |
+| `DeepSigma.DocumentReader.Html` | HTML reader (text, sections, tables, links) | AngleSharp |
+| `DeepSigma.DocumentReader.Email` | Email (.eml) reader (headers, bodies, attachments) | MimeKit |
 | `DeepSigma.DocumentReader.Export` | Text / Markdown / JSON exporters | none |
 | `DeepSigma.DocumentReader` | Convenience meta-package: factory + DI defaults | (the above) |
 | `DeepSigma.DocumentReader.Cli` | `dsread` command-line tool | System.CommandLine |
 
-Planned: `Pdf`, `Email`, `Html`, `Ocr`.
+The email reader reuses the HTML reader's text extraction (via the `IHtmlTextExtractor`
+contract) when both are registered, without taking a hard dependency on it.
+
+Planned: `Ocr`.
 
 ## Dependency injection
 
 ```csharp
 builder.Services.AddDeepSigmaDocumentReaderDefaults();
 // or compose explicitly:
-builder.Services.AddDeepSigmaDocumentReader().AddText().AddJson().AddCsv().AddMarkdown().AddOffice();
+builder.Services.AddDeepSigmaDocumentReader()
+    .AddText().AddJson().AddCsv().AddMarkdown().AddOffice().AddPdf().AddHtml().AddEmail();
 ```
 
 ## CLI (`dsread`)

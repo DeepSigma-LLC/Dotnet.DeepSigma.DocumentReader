@@ -19,21 +19,10 @@ public sealed class MarkdownReadOptions : IFormatReadOptions
     public bool ExtractLinks { get; init; } = true;
 }
 
-/// <summary>A heading extracted from a Markdown document.</summary>
-/// <param name="Level">The heading level (1–6).</param>
-/// <param name="Text">The heading text.</param>
-public sealed record DocumentHeading(int Level, string Text);
-
 /// <summary>A fenced or indented code block.</summary>
 /// <param name="Language">The fenced code info string (language), if any.</param>
 /// <param name="Code">The code content.</param>
 public sealed record DocumentCodeBlock(string? Language, string Code);
-
-/// <summary>A link or image reference.</summary>
-/// <param name="Text">The link/alt text, if any.</param>
-/// <param name="Url">The target URL.</param>
-/// <param name="IsImage">Whether the reference is an image.</param>
-public sealed record DocumentLink(string? Text, string Url, bool IsImage);
 
 /// <summary>Format-specific Markdown details attached to a read result.</summary>
 public sealed class MarkdownDocumentFeature : IDocumentFeature

@@ -115,6 +115,18 @@ public sealed class ContentSniffSignal : IDetectionSignal
             return;
         }
 
+        if (IsHtml(trimmedStart))
+        {
+            context.AddCandidate(DocumentKind.Html, 55, Name);
+            return;
+        }
+
+        if (LooksLikeEmail(lines, text))
+        {
+            context.AddCandidate(DocumentKind.Email, 55, Name);
+            return;
+        }
+
         bool hasFrontMatter = trimmedStart.StartsWith("---\n", StringComparison.Ordinal)
             || trimmedStart.StartsWith("---\r\n", StringComparison.Ordinal);
         bool hasHeading = lines.Any(l => IsMarkdownHeading(l));
@@ -140,6 +152,55 @@ public sealed class ContentSniffSignal : IDetectionSignal
         }
 
         return hashes is >= 1 and <= 6 && hashes < line.Length && line[hashes] == ' ';
+    }
+
+    private static bool IsHtml(string trimmedStart)
+    {
+        if (trimmedStart.Length == 0 || trimmedStart[0] != '<')
+        {
+            return false;
+        }
+
+        string head = (trimmedStart.Length > 512 ? trimmedStart[..512] : trimmedStart).ToLowerInvariant();
+        return head.Contains("<html", StringComparison.Ordinal)
+            || head.Contains("<!doctype html", StringComparison.Ordinal)
+            || head.Contains("<head", StringComparison.Ordinal)
+            || head.Contains("<body", StringComparison.Ordinal);
+    }
+
+    private static bool LooksLikeEmail(List<string> lines, string text)
+    {
+        if (lines.Count == 0 || !IsHeaderLine(lines[0]))
+        {
+            return false;
+        }
+
+        string lower = (text.Length > 2048 ? text[..2048] : text).ToLowerInvariant();
+        bool hasFrom = lower.StartsWith("from:", StringComparison.Ordinal) || lower.Contains("\nfrom:", StringComparison.Ordinal);
+        bool corroborating = lower.Contains("mime-version:", StringComparison.Ordinal)
+            || lower.Contains("\nreceived:", StringComparison.Ordinal)
+            || lower.Contains("\nsubject:", StringComparison.Ordinal)
+            || lower.Contains("\nto:", StringComparison.Ordinal);
+        return hasFrom && corroborating;
+    }
+
+    private static bool IsHeaderLine(string line)
+    {
+        int colon = line.IndexOf(':', StringComparison.Ordinal);
+        if (colon <= 0)
+        {
+            return false;
+        }
+
+        foreach (char c in line.AsSpan(0, colon))
+        {
+            if (c <= ' ')
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static bool LooksLikeDelimited(List<string> lines)

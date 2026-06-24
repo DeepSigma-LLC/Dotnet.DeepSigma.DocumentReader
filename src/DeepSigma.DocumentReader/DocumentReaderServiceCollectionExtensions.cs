@@ -7,9 +7,9 @@ namespace DeepSigma.DocumentReader;
 public static class DocumentReaderServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers the core reader, the default readers (text, Markdown, JSON, CSV, and the
-    /// Office formats DOCX/XLSX/PPTX), and the text/Markdown/JSON exporters with their
-    /// resolver. Does not include OCR.
+    /// Registers the core reader, the default readers (text, Markdown, JSON, CSV, the Office
+    /// formats DOCX/XLSX/PPTX, PDF, HTML, and email), and the text/Markdown/JSON exporters
+    /// with their resolver. Does not include OCR.
     /// </summary>
     public static IServiceCollection AddDeepSigmaDocumentReaderDefaults(this IServiceCollection services)
     {
@@ -20,7 +20,10 @@ public static class DocumentReaderServiceCollectionExtensions
             .AddMarkdown()
             .AddJson()
             .AddCsv()
-            .AddOffice();
+            .AddOffice()
+            .AddPdf()
+            .AddHtml()
+            .AddEmail();
 
         services.AddSingleton<IDocumentResultExporter, TextResultExporter>();
         services.AddSingleton<IDocumentResultExporter, MarkdownResultExporter>();

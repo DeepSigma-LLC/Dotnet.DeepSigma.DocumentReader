@@ -136,3 +136,31 @@ public abstract class DocumentAttachment
     public DocumentSource AsDocumentSource()
         => DocumentSource.FromStream(OpenReadStream(), FileName, ContentType);
 }
+
+/// <summary>A heading extracted from a document (Markdown, HTML, …).</summary>
+/// <param name="Level">The heading level (1 = top level).</param>
+/// <param name="Text">The heading text.</param>
+public sealed record DocumentHeading(int Level, string Text);
+
+/// <summary>A link or image reference.</summary>
+/// <param name="Text">The link/alt text, if any.</param>
+/// <param name="Url">The target URL.</param>
+/// <param name="IsImage">Whether the reference is an image.</param>
+public sealed record DocumentLink(string? Text, string Url, bool IsImage);
+
+/// <summary>An attachment whose content is held in memory as a byte array.</summary>
+public sealed class ByteArrayDocumentAttachment : DocumentAttachment
+{
+    private readonly byte[] _content;
+
+    /// <summary>Creates an attachment over the supplied content.</summary>
+    public ByteArrayDocumentAttachment(byte[] content)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+        _content = content;
+        SizeBytes = content.Length;
+    }
+
+    /// <inheritdoc />
+    public override Stream OpenReadStream() => new MemoryStream(_content, writable: false);
+}
