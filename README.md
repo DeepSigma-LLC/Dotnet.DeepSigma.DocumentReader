@@ -8,7 +8,7 @@ The consumer never has to know whether a file is plain text, JSON, CSV, a Word d
 PDF, an email, or HTML — the library detects the type and routes to the right reader.
 
 **Implemented formats:** plain text, Markdown, JSON / JSON Lines, CSV, Word (DOCX),
-Excel (XLSX), PowerPoint (PPTX), PDF, HTML, email (`.eml`).
+Excel (XLSX), PowerPoint (PPTX), PDF, HTML, email (`.eml` and Outlook `.msg`).
 
 ---
 
@@ -332,7 +332,7 @@ Packages are grouped by *dependency tree*, so a consumer only pulls the dependen
 | `DeepSigma.DocumentReader.Office` | Word (DOCX), Excel (XLSX), PowerPoint (PPTX) readers | DocumentFormat.OpenXml, ClosedXML |
 | `DeepSigma.DocumentReader.Pdf` | PDF reader (page text, page model, metadata; opt-in best-effort tables) | PdfPig |
 | `DeepSigma.DocumentReader.Html` | HTML reader (text, sections, tables, links) | AngleSharp |
-| `DeepSigma.DocumentReader.Email` | Email (.eml) reader (headers, bodies, attachments) | MimeKit |
+| `DeepSigma.DocumentReader.Email` | Email reader: MIME (.eml) and Outlook (.msg) — headers, bodies, attachments | MimeKit, MsgReader |
 | `DeepSigma.DocumentReader.Export` | Text / Markdown / JSON exporters | none |
 | `DeepSigma.DocumentReader` | Convenience meta-package: factory + DI defaults | (the above) |
 | `DeepSigma.DocumentReader.Cli` | `dsread` command-line tool | System.CommandLine |

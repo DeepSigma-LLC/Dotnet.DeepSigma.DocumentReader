@@ -6,12 +6,15 @@ namespace DeepSigma.DocumentReader;
 public static class EmailDocumentReaderBuilderExtensions
 {
     /// <summary>
-    /// Registers the email reader. If an <see cref="IHtmlTextExtractor"/> is also registered
-    /// (via <c>AddHtml()</c>), it is used to convert HTML bodies to text.
+    /// Registers the email readers for both MIME (<c>.eml</c>) and Outlook (<c>.msg</c>)
+    /// messages. If an <see cref="IHtmlTextExtractor"/> is also registered (via <c>AddHtml()</c>),
+    /// it is used to convert HTML bodies to text.
     /// </summary>
     public static IDocumentReaderBuilder AddEmail(this IDocumentReaderBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        return builder.AddReader<EmailDocumentReader>();
+        return builder
+            .AddReader<EmailDocumentReader>()
+            .AddReader<OutlookMsgDocumentReader>();
     }
 }

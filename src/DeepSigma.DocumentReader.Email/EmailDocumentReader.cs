@@ -1,31 +1,30 @@
-using System.Net;
-using System.Text.RegularExpressions;
 using DeepSigma.DocumentReader.Core.Readers;
+using DeepSigma.DocumentReader.Email.Internal;
 using MimeKit;
 
 namespace DeepSigma.DocumentReader.Email;
 
 /// <summary>
-/// Reads email messages (.eml) using MimeKit: headers, sender/recipients, subject, date,
-/// the text body (or HTML body converted to text), and attachments. Remote content is never
-/// fetched. Attachments are exposed for the caller to read recursively under its own limits.
+/// Reads MIME email messages (<c>.eml</c>) using MimeKit: headers, sender/recipients, subject,
+/// date, the text body (or HTML body converted to text), and attachments. Remote content is
+/// never fetched. Attachments are exposed for the caller to read recursively under its own
+/// limits.
 /// </summary>
-public sealed partial class EmailDocumentReader : FormatDocumentReaderBase
+public sealed class EmailDocumentReader : EmailReaderBase
 {
-    private readonly IHtmlTextExtractor? _htmlTextExtractor;
-
     /// <summary>Creates a reader that uses a naive HTML-to-text fallback.</summary>
     public EmailDocumentReader() : this([]) { }
 
     /// <summary>Creates a reader, reusing the first registered <see cref="IHtmlTextExtractor"/> if any.</summary>
-    public EmailDocumentReader(IEnumerable<IHtmlTextExtractor> htmlTextExtractors)
-    {
-        ArgumentNullException.ThrowIfNull(htmlTextExtractors);
-        _htmlTextExtractor = htmlTextExtractors.FirstOrDefault();
-    }
+    public EmailDocumentReader(IEnumerable<IHtmlTextExtractor> htmlTextExtractors) : base(htmlTextExtractors) { }
 
     /// <inheritdoc />
-    public override IReadOnlyCollection<DocumentKind> SupportedKinds { get; } = [DocumentKind.Email];
+    /// <remarks>Yields to the Outlook <c>.msg</c> reader for OLE2 content, which MimeKit cannot parse.</remarks>
+    public override int GetConfidence(DocumentSource source, DocumentTypeDetectionResult detectionResult)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        return OleSignature.IsOle2(source.Stream) ? 0 : base.GetConfidence(source, detectionResult);
+    }
 
     /// <inheritdoc />
     protected override async Task<DocumentReadResult> ReadCoreAsync(DocumentReadContext context, CancellationToken cancellationToken)
@@ -35,15 +34,7 @@ public sealed partial class EmailDocumentReader : FormatDocumentReaderBase
 
         string? textBody = message.TextBody;
         string? htmlBody = message.HtmlBody;
-        string? htmlAsText = htmlBody is null ? null : HtmlToText(htmlBody);
-
-        string? body = options.PreferHtmlBody && htmlAsText is not null
-            ? htmlAsText
-            : textBody ?? htmlAsText;
-
-        var attachments = context.Options.ExtractAttachments
-            ? ReadAttachments(message)
-            : [];
+        string? body = ChooseBody(options, textBody, HtmlToText(htmlBody));
 
         var feature = new EmailDocumentFeature
         {
@@ -57,32 +48,8 @@ public sealed partial class EmailDocumentReader : FormatDocumentReaderBase
             Headers = MapHeaders(message.Headers),
         };
 
-        return new DocumentReadResult
-        {
-            Source = context.CreateSourceInfo(DocumentKind.Email),
-            Kind = DocumentKind.Email,
-            Text = context.Options.ExtractText ? body : null,
-            Attachments = attachments,
-            Metadata = new DocumentMetadata
-            {
-                Title = string.IsNullOrEmpty(message.Subject) ? null : message.Subject,
-                Author = message.From.Mailboxes.FirstOrDefault()?.Address,
-                CreatedUtc = message.Date == default ? null : message.Date,
-            },
-            Quality = ExtractionQuality.High,
-            Warnings = context.Warnings.ToArray(),
-            Features = [feature],
-        };
-    }
-
-    private string HtmlToText(string html)
-        => _htmlTextExtractor is { } extractor ? extractor.ExtractText(html) : NaiveStrip(html);
-
-    private static string NaiveStrip(string html)
-    {
-        string withoutTags = HtmlTagRegex().Replace(html, " ");
-        string decoded = WebUtility.HtmlDecode(withoutTags);
-        return WhitespaceRegex().Replace(decoded, " ").Trim();
+        var attachments = context.Options.ExtractAttachments ? ReadAttachments(message) : [];
+        return BuildResult(context, feature, body, attachments);
     }
 
     private static IReadOnlyList<EmailAddress> MapAddresses(InternetAddressList list)
@@ -131,10 +98,4 @@ public sealed partial class EmailDocumentReader : FormatDocumentReaderBase
 
         return result;
     }
-
-    [GeneratedRegex("<[^>]+>")]
-    private static partial Regex HtmlTagRegex();
-
-    [GeneratedRegex("\\s+")]
-    private static partial Regex WhitespaceRegex();
 }

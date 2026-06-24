@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="MimeKit" />
+    <PackageReference Include="MsgReader" />
   </ItemGroup>
 
 </Project>

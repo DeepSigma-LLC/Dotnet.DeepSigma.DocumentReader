@@ -30,6 +30,7 @@ public static class FileFormatRegistry
         [".pptx"] = DocumentKind.Presentation,
         [".pptm"] = DocumentKind.Presentation,
         [".eml"] = DocumentKind.Email,
+        [".msg"] = DocumentKind.Email,
         [".html"] = DocumentKind.Html,
         [".htm"] = DocumentKind.Html,
         [".png"] = DocumentKind.Image,
@@ -76,6 +77,7 @@ public static class FileFormatRegistry
         ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"] = DocumentKind.Spreadsheet,
         ["application/vnd.openxmlformats-officedocument.presentationml.presentation"] = DocumentKind.Presentation,
         ["message/rfc822"] = DocumentKind.Email,
+        ["application/vnd.ms-outlook"] = DocumentKind.Email,
         ["text/html"] = DocumentKind.Html,
         ["application/zip"] = DocumentKind.Archive,
     };
