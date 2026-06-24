@@ -33,7 +33,9 @@ public sealed class PdfDateParserTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("not a date")]
-    [InlineData("D:2026139999")] // invalid month/day
+    [InlineData("D:2026139999")] // invalid month/day -> ArgumentException
+    [InlineData("D:20260601100000+AB'CD'")] // non-digit offset -> FormatException
+    [InlineData("D:20260601100000+99'00'")] // out-of-range offset -> ArgumentException
     public void Returns_null_for_missing_or_malformed(string? input)
         => Assert.Null(PdfDateParser.Parse(input));
 }

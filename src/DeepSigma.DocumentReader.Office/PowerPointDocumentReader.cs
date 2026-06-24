@@ -219,13 +219,7 @@ public sealed class PowerPointDocumentReader : FormatDocumentReaderBase
 
     private static DocumentMetadata ReadMetadata(PresentationDocument document)
     {
-        var properties = document.PackageProperties;
-        return new DocumentMetadata
-        {
-            Title = properties.Title,
-            Author = properties.Creator,
-            CreatedUtc = OfficeMetadata.ToOffset(properties.Created),
-            ModifiedUtc = OfficeMetadata.ToOffset(properties.Modified),
-        };
+        var p = document.PackageProperties;
+        return OfficeMetadata.FromCoreProperties(p.Title, p.Creator, p.Created, p.Modified, p.Language);
     }
 }

@@ -1,4 +1,4 @@
-using System.Text;
+using DeepSigma.DocumentReader.Core.Text;
 
 namespace DeepSigma.DocumentReader.Core.Detection;
 
@@ -16,7 +16,7 @@ public sealed class DetectionContext
         ContentType = contentType;
         Extension = string.IsNullOrEmpty(fileName) ? null : Path.GetExtension(fileName);
         Prefix = prefix;
-        PrefixText = DecodePrefix(prefix.Span);
+        PrefixText = TextContent.DecodeBomAware(prefix.Span);
     }
 
     /// <summary>The source file name, if known.</summary>
@@ -46,31 +46,5 @@ public sealed class DetectionContext
         }
 
         _candidates.Add(new DocumentTypeCandidate(kind, Math.Clamp(confidence, 0, 100), signal));
-    }
-
-    private static string DecodePrefix(ReadOnlySpan<byte> bytes)
-    {
-        if (bytes.IsEmpty)
-        {
-            return string.Empty;
-        }
-
-        // Honor a UTF-8/UTF-16 BOM when present; otherwise decode as UTF-8 without throwing.
-        if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
-        {
-            return Encoding.UTF8.GetString(bytes[3..]);
-        }
-
-        if (bytes.Length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE)
-        {
-            return Encoding.Unicode.GetString(bytes[2..]);
-        }
-
-        if (bytes.Length >= 2 && bytes[0] == 0xFE && bytes[1] == 0xFF)
-        {
-            return Encoding.BigEndianUnicode.GetString(bytes[2..]);
-        }
-
-        return Encoding.UTF8.GetString(bytes);
     }
 }

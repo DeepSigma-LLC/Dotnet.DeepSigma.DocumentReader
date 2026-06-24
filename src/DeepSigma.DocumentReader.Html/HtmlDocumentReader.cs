@@ -1,7 +1,8 @@
-using System.Text;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using DeepSigma.DocumentReader.Core.Readers;
+using DeepSigma.DocumentReader.Core.Text;
+using DeepSigma.DocumentReader.Html.Internal;
 
 namespace DeepSigma.DocumentReader.Html;
 
@@ -22,8 +23,7 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
     {
         var options = context.Options.GetOptions<HtmlReadOptions>();
 
-        using var reader = new StreamReader(context.Stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, leaveOpen: true);
-        string html = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+        string html = await TextContent.ReadAllTextAsync(context.Stream, cancellationToken).ConfigureAwait(false);
 
         using IDocument document = Parser.ParseDocument(html);
 
@@ -36,7 +36,7 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
         {
             Source = context.CreateSourceInfo(DocumentKind.Html),
             Kind = DocumentKind.Html,
-            Text = context.Options.ExtractText ? TextExtractor.ExtractText(html) : null,
+            Text = context.Options.ExtractText ? TextExtractor.ExtractText(document) : null,
             Sections = SectionTreeBuilder.Build(headingEntries),
             Tables = tables,
             Metadata = new DocumentMetadata { Title = string.IsNullOrWhiteSpace(document.Title) ? null : document.Title },
@@ -44,22 +44,6 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
             Warnings = context.Warnings.ToArray(),
             Features = [new HtmlDocumentFeature { Headings = headings, Links = links }],
         };
-    }
-
-    private static readonly HashSet<string> SkipElements =
-        new(StringComparer.OrdinalIgnoreCase) { "script", "style", "noscript", "head", "title", "template" };
-
-    private static readonly HashSet<string> BlockElements = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "p", "div", "section", "article", "header", "footer", "main", "aside",
-        "ul", "ol", "li", "table", "tr", "blockquote", "pre", "figure", "br",
-    };
-
-    private sealed class SectionAccumulator(int level, string title)
-    {
-        public int Level { get; } = level;
-        public string Title { get; } = title;
-        public StringBuilder Body { get; } = new();
     }
 
     /// <summary>
@@ -84,7 +68,7 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
                         current?.Body.Append(text.Data);
                         break;
 
-                    case IElement element when !SkipElements.Contains(element.LocalName):
+                    case IElement element when !HtmlElements.Skip.Contains(element.LocalName):
                         if (IsHeading(element, out int level))
                         {
                             string title = element.TextContent.Trim();
@@ -95,7 +79,7 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
                         }
 
                         Walk(element);
-                        if (BlockElements.Contains(element.LocalName))
+                        if (HtmlElements.Block.Contains(element.LocalName))
                         {
                             current?.Body.Append('\n');
                         }
@@ -106,7 +90,7 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
         }
 
         var entries = sections
-            .Select(s => new HeadingEntry(s.Level, s.Title, NormalizeBody(s.Body.ToString())))
+            .Select(s => new HeadingEntry(s.Level, s.Title, HtmlElements.NormalizeOrNull(s.Body.ToString())))
             .ToList();
         return (headings, entries);
     }
@@ -122,16 +106,6 @@ public sealed class HtmlDocumentReader : FormatDocumentReaderBase
 
         level = 0;
         return false;
-    }
-
-    private static string? NormalizeBody(string text)
-    {
-        IEnumerable<string> lines = text
-            .Split('\n')
-            .Select(line => string.Join(' ', line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)))
-            .Where(line => line.Length > 0);
-        string normalized = string.Join("\n", lines);
-        return normalized.Length == 0 ? null : normalized;
     }
 
     private static IReadOnlyList<DocumentTable> ConvertTables(IDocument document)

@@ -122,7 +122,11 @@ public sealed partial class EmailDocumentReader : FormatDocumentReaderBase
         var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (Header header in headers)
         {
-            result[header.Field] = header.Value;
+            // RFC 5322 permits repeated header fields (Received, DKIM-Signature, …); preserve
+            // every occurrence by joining with newlines rather than overwriting.
+            result[header.Field] = result.TryGetValue(header.Field, out string? existing)
+                ? $"{existing}\n{header.Value}"
+                : header.Value;
         }
 
         return result;

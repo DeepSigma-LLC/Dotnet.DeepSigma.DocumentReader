@@ -194,25 +194,30 @@ public sealed class CliRunner(
         foreach (string file in Directory.EnumerateFiles(inputDirectory, "*", searchOption))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            string name = Path.GetFileName(file);
+
+            // Mirror the input's relative path and keep its original extension so that files
+            // with the same stem (report.txt vs report.pdf) or the same name in different
+            // subdirectories do not overwrite each other.
+            string relative = Path.GetRelativePath(inputDirectory, file);
             try
             {
                 using var source = DocumentSource.FromFile(file);
                 DocumentReadResult result = await reader.ReadAsync(source, options, cancellationToken).ConfigureAwait(false);
 
-                string outputFile = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(name) + extension);
+                string outputFile = Path.Combine(outputDirectory, relative + extension);
+                Directory.CreateDirectory(Path.GetDirectoryName(outputFile)!);
                 await using (var outStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     await exporter.ExportAsync(result, outStream, cancellationToken).ConfigureAwait(false);
                 }
 
-                await WriteManifestLineAsync(manifestWriter, name, result.Kind.ToString(), result.Quality.ToString(), result.Warnings.Count, success: true).ConfigureAwait(false);
+                await WriteManifestLineAsync(manifestWriter, relative, result.Kind.ToString(), result.Quality.ToString(), result.Warnings.Count, success: true).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 failures++;
-                await error.WriteLineAsync($"Failed: {name}: {ex.Message}").ConfigureAwait(false);
-                await WriteManifestLineAsync(manifestWriter, name, "Unknown", "Failed", 0, success: false).ConfigureAwait(false);
+                await error.WriteLineAsync($"Failed: {relative}: {ex.Message}").ConfigureAwait(false);
+                await WriteManifestLineAsync(manifestWriter, relative, "Unknown", "Failed", 0, success: false).ConfigureAwait(false);
             }
         }
 

@@ -60,6 +60,17 @@ public sealed class EmailDocumentReaderTests
     }
 
     [Fact]
+    public async Task Preserves_repeated_headers()
+    {
+        DocumentReadResult result = await ReadAsync(EmailSamples.RepeatedHeaders());
+
+        var feature = result.GetFeature<EmailDocumentFeature>();
+        string received = Assert.Contains("Received", (IReadOnlyDictionary<string, string>)feature!.Headers);
+        Assert.Contains("a.example.com", received, StringComparison.Ordinal);
+        Assert.Contains("b.example.com", received, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task Composite_detects_and_routes_eml_by_content()
     {
         var reader = new CompositeDocumentReader([new EmailDocumentReader()], CompositeDocumentTypeDetector.CreateDefault());

@@ -9,8 +9,19 @@ namespace DeepSigma.DocumentReader;
 /// </summary>
 public static class DocumentReaderFactory
 {
-    /// <summary>Builds a reader with the default text-family readers registered.</summary>
-    public static IDocumentReader CreateDefault()
+    // Built once and cached for the process. The backing ServiceProvider lives for the
+    // application lifetime by design; this avoids leaking a new provider on every call.
+    private static readonly Lazy<IDocumentReader> DefaultReader =
+        new(BuildDefault, LazyThreadSafetyMode.ExecutionAndPublication);
+
+    /// <summary>
+    /// Returns a process-wide shared reader with the default readers registered. For apps
+    /// that manage their own lifetime/scopes, prefer
+    /// <see cref="DocumentReaderServiceCollectionExtensions.AddDeepSigmaDocumentReaderDefaults"/>.
+    /// </summary>
+    public static IDocumentReader CreateDefault() => DefaultReader.Value;
+
+    private static IDocumentReader BuildDefault()
     {
         var services = new ServiceCollection();
         services.AddDeepSigmaDocumentReaderDefaults();

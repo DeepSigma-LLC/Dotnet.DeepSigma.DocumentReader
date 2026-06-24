@@ -37,6 +37,19 @@ internal static class EmailSamples
         <html><body><p>Hello HTML world.</p></body></html>
         """);
 
+    public static byte[] RepeatedHeaders() => Encode("""
+        From: Alice <alice@example.com>
+        To: Bob <bob@example.com>
+        Subject: Routed
+        Received: from a.example.com
+        Received: from b.example.com
+        Date: Mon, 01 Jun 2026 10:00:00 +0000
+        MIME-Version: 1.0
+        Content-Type: text/plain; charset=utf-8
+
+        Body.
+        """);
+
     private static byte[] Encode(string raw)
         => Encoding.UTF8.GetBytes(raw.Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\n", "\r\n", StringComparison.Ordinal));
 }

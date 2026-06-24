@@ -1,6 +1,6 @@
 using System.Text;
 using DeepSigma.DocumentReader.Core.Readers;
-using DeepSigma.DocumentReader.Plaintext.Internal;
+using DeepSigma.DocumentReader.Core.Text;
 
 namespace DeepSigma.DocumentReader.Plaintext;
 
@@ -21,13 +21,13 @@ public sealed class TextDocumentReader : FormatDocumentReaderBase
         CancellationToken cancellationToken)
     {
         var options = context.Options.GetOptions<TextReadOptions>();
-        byte[] bytes = await ContentReader.ReadAllBytesAsync(context.Stream, cancellationToken).ConfigureAwait(false);
+        byte[] bytes = await TextContent.ReadAllBytesAsync(context.Stream, cancellationToken).ConfigureAwait(false);
 
         string text = Decode(bytes, options, context);
 
         if (options.NormalizeLineEndings)
         {
-            text = ContentReader.NormalizeLineEndings(text);
+            text = TextContent.NormalizeLineEndings(text);
         }
 
         if (options.MaxCharacters is { } max && text.Length > max)
@@ -51,13 +51,12 @@ public sealed class TextDocumentReader : FormatDocumentReaderBase
     {
         if (options.Encoding is { } explicitEncoding)
         {
-            return explicitEncoding.GetString(StripBom(bytes, explicitEncoding));
+            return explicitEncoding.GetString(TextContent.StripBom(bytes, explicitEncoding));
         }
 
-        // BOM-based detection covers UTF-8/UTF-16; ContentReader handles those.
-        if (HasBom(bytes) || !options.DetectEncoding)
+        if (TextContent.HasBom(bytes) || !options.DetectEncoding)
         {
-            return ContentReader.DecodeUtf8(bytes);
+            return TextContent.DecodeBomAware(bytes);
         }
 
         // No BOM: try strict UTF-8, falling back to Latin-1 (1:1 byte mapping) on invalid bytes.
@@ -72,21 +71,5 @@ public sealed class TextDocumentReader : FormatDocumentReaderBase
                 "Content was not valid UTF-8; decoded as Latin-1 (ISO-8859-1).");
             return Encoding.Latin1.GetString(bytes);
         }
-    }
-
-    private static bool HasBom(byte[] b) =>
-        (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) ||
-        (b.Length >= 2 && b[0] == 0xFF && b[1] == 0xFE) ||
-        (b.Length >= 2 && b[0] == 0xFE && b[1] == 0xFF);
-
-    private static byte[] StripBom(byte[] bytes, Encoding encoding)
-    {
-        ReadOnlySpan<byte> preamble = encoding.GetPreamble();
-        if (preamble.Length > 0 && bytes.Length >= preamble.Length && bytes.AsSpan(0, preamble.Length).SequenceEqual(preamble))
-        {
-            return bytes[preamble.Length..];
-        }
-
-        return bytes;
     }
 }

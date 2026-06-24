@@ -145,26 +145,27 @@ public sealed class CompositeDocumentTypeDetector : IDocumentTypeDetector
             }
         }
 
-        DocumentKind bestKind = DocumentKind.Unknown;
-        int bestScore = -1;
-        foreach (var (kind, agg) in byKind)
-        {
-            int score = Math.Min(100, agg.Best + (agg.Count - 1) * 5);
-            if (score > bestScore)
-            {
-                bestScore = score;
-                bestKind = kind;
-            }
-        }
+        // Deterministic winner: highest combined score, then strongest single signal, then a
+        // fixed kind order — so identical input always resolves to the same kind.
+        var ranked = byKind
+            .Select(kv => (Kind: kv.Key, Score: Math.Min(100, kv.Value.Best + (kv.Value.Count - 1) * 5), kv.Value.Best))
+            .OrderByDescending(x => x.Score)
+            .ThenByDescending(x => x.Best)
+            .ThenBy(x => x.Kind)
+            .ToList();
+
+        DocumentKind bestKind = ranked.Count > 0 ? ranked[0].Kind : DocumentKind.Unknown;
+        int bestScore = ranked.Count > 0 ? ranked[0].Score : 0;
 
         var ordered = context.Candidates
             .OrderByDescending(c => c.Confidence)
+            .ThenBy(c => c.Kind)
             .ToList();
 
         return new DocumentTypeDetectionResult
         {
             Kind = bestKind,
-            Confidence = bestScore < 0 ? 0 : bestScore,
+            Confidence = bestScore,
             Extension = context.Extension,
             ContentType = context.ContentType ?? FileFormatRegistry.ContentTypeForKind(bestKind),
             Candidates = ordered,

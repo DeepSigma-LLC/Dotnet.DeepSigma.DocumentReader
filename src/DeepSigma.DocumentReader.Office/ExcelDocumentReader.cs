@@ -133,6 +133,8 @@ public sealed class ExcelDocumentReader : FormatDocumentReaderBase
         XLDataType.Boolean => value.GetBoolean(),
         XLDataType.DateTime => value.GetDateTime(),
         XLDataType.TimeSpan => value.GetTimeSpan(),
+        // Surface the error code (e.g. "#REF!") so an error cell is distinguishable from blank.
+        XLDataType.Error => value.GetError().ToString(),
         _ => null,
     };
 

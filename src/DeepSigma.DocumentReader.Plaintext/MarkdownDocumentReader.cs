@@ -1,6 +1,6 @@
 using System.Text;
 using DeepSigma.DocumentReader.Core.Readers;
-using DeepSigma.DocumentReader.Plaintext.Internal;
+using DeepSigma.DocumentReader.Core.Text;
 using Markdig;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
@@ -31,8 +31,8 @@ public sealed class MarkdownDocumentReader : FormatDocumentReaderBase
         CancellationToken cancellationToken)
     {
         var options = context.Options.GetOptions<MarkdownReadOptions>();
-        byte[] bytes = await ContentReader.ReadAllBytesAsync(context.Stream, cancellationToken).ConfigureAwait(false);
-        string text = ContentReader.DecodeUtf8(bytes);
+        byte[] bytes = await TextContent.ReadAllBytesAsync(context.Stream, cancellationToken).ConfigureAwait(false);
+        string text = TextContent.DecodeBomAware(bytes);
 
         MarkdownDocument document = Markdown.Parse(text, Pipeline);
 
@@ -60,7 +60,7 @@ public sealed class MarkdownDocumentReader : FormatDocumentReaderBase
         }
 
         var headingEntries = sections
-            .Select(s => new HeadingEntry(s.Level, s.Title, s.Body.Length == 0 ? null : s.Body.ToString().TrimEnd('\n')))
+            .Select(s => new HeadingEntry(s.Level, s.Title, s.BodyText()))
             .ToList();
 
         var tables = context.Options.ExtractTables ? ConvertTables(document) : [];
@@ -194,13 +194,6 @@ public sealed class MarkdownDocumentReader : FormatDocumentReaderBase
         }
 
         return result;
-    }
-
-    private sealed class SectionAccumulator(int level, string title)
-    {
-        public int Level { get; } = level;
-        public string Title { get; } = title;
-        public StringBuilder Body { get; } = new();
     }
 
     private static string GetInlineText(ContainerInline? container)

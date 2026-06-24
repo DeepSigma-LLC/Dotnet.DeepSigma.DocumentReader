@@ -46,8 +46,10 @@ internal static class PdfDateParser
             TimeSpan offset = ParseOffset(value[digitCount..]);
             return new DateTimeOffset(year, month, day, hour, minute, second, offset);
         }
-        catch (ArgumentOutOfRangeException)
+        catch (Exception ex) when (ex is ArgumentException or FormatException or OverflowException)
         {
+            // Malformed date/offset (out-of-range fields, non-whole-minute or >14h offset,
+            // or non-digit offset characters) — treat as no date rather than failing the read.
             return null;
         }
     }

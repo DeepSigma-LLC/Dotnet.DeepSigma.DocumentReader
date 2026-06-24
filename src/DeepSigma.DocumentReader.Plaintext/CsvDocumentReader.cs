@@ -2,7 +2,7 @@ using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 using DeepSigma.DocumentReader.Core.Readers;
-using DeepSigma.DocumentReader.Plaintext.Internal;
+using DeepSigma.DocumentReader.Core.Text;
 
 namespace DeepSigma.DocumentReader.Plaintext;
 
@@ -22,8 +22,8 @@ public sealed class CsvDocumentReader : FormatDocumentReaderBase
         CancellationToken cancellationToken)
     {
         var options = context.Options.GetOptions<CsvReadOptions>();
-        byte[] bytes = await ContentReader.ReadAllBytesAsync(context.Stream, cancellationToken).ConfigureAwait(false);
-        string text = ContentReader.DecodeUtf8(bytes);
+        byte[] bytes = await TextContent.ReadAllBytesAsync(context.Stream, cancellationToken).ConfigureAwait(false);
+        string text = TextContent.DecodeBomAware(bytes);
         string delimiter = options.Delimiter ?? DetectDelimiter(text);
 
         int malformed = 0;

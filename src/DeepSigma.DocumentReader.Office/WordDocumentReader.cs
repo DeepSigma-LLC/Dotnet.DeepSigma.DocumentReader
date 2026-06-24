@@ -65,7 +65,7 @@ public sealed class WordDocumentReader : FormatDocumentReaderBase
         }
 
         var headings = sections
-            .Select(s => new HeadingEntry(s.Level, s.Title, NullIfEmpty(s.Body)))
+            .Select(s => new HeadingEntry(s.Level, s.Title, s.BodyText()))
             .ToList();
 
         if (options.IncludeHeadersAndFooters && mainPart is not null)
@@ -97,16 +97,6 @@ public sealed class WordDocumentReader : FormatDocumentReaderBase
 
         return Task.FromResult(result);
     }
-
-    private sealed class SectionAccumulator(int level, string title)
-    {
-        public int Level { get; } = level;
-        public string Title { get; } = title;
-        public StringBuilder Body { get; } = new();
-    }
-
-    private static string? NullIfEmpty(StringBuilder body)
-        => body.Length == 0 ? null : body.ToString().TrimEnd('\n');
 
     private static string GetParagraphText(Paragraph paragraph, bool includeDeleted)
     {
@@ -143,7 +133,7 @@ public sealed class WordDocumentReader : FormatDocumentReaderBase
         }
 
         string digits = new([.. styleId.Where(char.IsDigit)]);
-        return int.TryParse(digits, out int level) && level is >= 1 and <= 9 ? level : null;
+        return int.TryParse(digits, out int level) && level >= 1 ? level : null;
     }
 
     private static DocumentTable ConvertTable(Table table)
@@ -213,14 +203,7 @@ public sealed class WordDocumentReader : FormatDocumentReaderBase
 
     private static DocumentMetadata ReadMetadata(WordprocessingDocument document)
     {
-        var properties = document.PackageProperties;
-        return new DocumentMetadata
-        {
-            Title = properties.Title,
-            Author = properties.Creator,
-            CreatedUtc = OfficeMetadata.ToOffset(properties.Created),
-            ModifiedUtc = OfficeMetadata.ToOffset(properties.Modified),
-            Language = properties.Language,
-        };
+        var p = document.PackageProperties;
+        return OfficeMetadata.FromCoreProperties(p.Title, p.Creator, p.Created, p.Modified, p.Language);
     }
 }

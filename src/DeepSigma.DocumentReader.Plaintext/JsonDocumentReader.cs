@@ -1,6 +1,6 @@
 using System.Text.Json;
 using DeepSigma.DocumentReader.Core.Readers;
-using DeepSigma.DocumentReader.Plaintext.Internal;
+using DeepSigma.DocumentReader.Core.Text;
 
 namespace DeepSigma.DocumentReader.Plaintext;
 
@@ -21,8 +21,8 @@ public sealed class JsonDocumentReader : FormatDocumentReaderBase
         CancellationToken cancellationToken)
     {
         var options = context.Options.GetOptions<JsonReadOptions>();
-        byte[] bytes = await ContentReader.ReadAllBytesAsync(context.Stream, cancellationToken).ConfigureAwait(false);
-        string text = ContentReader.DecodeUtf8(bytes);
+        byte[] bytes = await TextContent.ReadAllBytesAsync(context.Stream, cancellationToken).ConfigureAwait(false);
+        string text = TextContent.DecodeBomAware(bytes);
 
         bool jsonLinesByExtension = HasJsonLinesExtension(context.Source.FileName);
         if (jsonLinesByExtension && options.TreatJsonLinesAsRecords)
@@ -47,8 +47,7 @@ public sealed class JsonDocumentReader : FormatDocumentReaderBase
 
     private DocumentReadResult ReadSingleDocument(string text, JsonReadOptions options, DocumentReadContext context)
     {
-        var documentOptions = new JsonDocumentOptions { MaxDepth = options.MaxDepth ?? 0 };
-        using var document = JsonDocument.Parse(text, documentOptions);
+        using var document = JsonDocument.Parse(text, CreateDocumentOptions(options));
 
         var values = options.FlattenPaths ? Flatten(document.RootElement) : [];
         string projection = options.PrettyPrint ? PrettyPrint(document.RootElement) : text;
@@ -81,7 +80,7 @@ public sealed class JsonDocumentReader : FormatDocumentReaderBase
 
             try
             {
-                using var document = JsonDocument.Parse(rawLine, new JsonDocumentOptions { MaxDepth = options.MaxDepth ?? 0 });
+                using var document = JsonDocument.Parse(rawLine, CreateDocumentOptions(options));
                 records.Add(new JsonRecord
                 {
                     Index = index,
@@ -131,6 +130,11 @@ public sealed class JsonDocumentReader : FormatDocumentReaderBase
             Warnings = context.Warnings.ToArray(),
         };
     }
+
+    private static JsonDocumentOptions CreateDocumentOptions(JsonReadOptions options)
+        => options.MaxDepth is { } depth
+            ? new JsonDocumentOptions { MaxDepth = depth }
+            : new JsonDocumentOptions();
 
     private static IReadOnlyList<JsonPathValue> Flatten(JsonElement root)
     {
